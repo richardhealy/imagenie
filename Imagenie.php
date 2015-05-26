@@ -1,20 +1,20 @@
 <?php 
 class Imagenie
 {
-	private $imagePosition = '';
-	private $layoutScheme = '';
-	private $imageContrast = 'unknown';
-	private $textFillPercent = 100;
-	private $themePalette = array();
-	private $mood = 'unknown';
-	private $generatedCss = '';
+    private $imagePosition = '';
+    private $layoutScheme = '';
+    private $imageContrast = 'unknown';
+    private $textFillPercent = 100;
+    private $themePalette = array();
+    private $mood = 'unknown';
+    private $generatedCss = '';
 
-	public function run($pythonLocation, $imagenieLocation, $filePath) {
+    public function run($pythonLocation, $imagenieLocation, $filePath) {
 
-		$command = escapeshellcmd($pythonLocation.' '.$imagenieLocation.' '.$filePath);
-    	$imagenieJsonString = shell_exec($command);
+        $command = escapeshellcmd($pythonLocation.' '.$imagenieLocation.' '.$filePath);
+        $imagenieJsonString = shell_exec($command);
 
-    	// Image Data
+        // Image Data
         if (strlen($imagenieJsonString) > 0) {
             $imagenieOutput = json_decode($imagenieJsonString);
         } else {
@@ -22,71 +22,71 @@ class Imagenie
         }
 
         return $imagenieOutput;
-	}
+    }
 
-	public function generateDesignData($imagenieData) {
+    public function generateDesignData($imagenieData) {
 
-		if (gettype($imagenieData) !== 'object') {
-        	return false;
+        if (gettype($imagenieData) !== 'object') {
+            return false;
         }
 
-		$this->generatePalette($imagenieData);
+        $this->generatePalette($imagenieData);
         $this->generateContrast($imagenieData);
         $this->generateMood($imagenieData);
         $this->generateLayout($imagenieData);
-	}
+    }
 
-	private function generateLayout($imagenieData) {
-		if (gettype($imagenieData) !== 'object') {
-        	return false;
+    private function generateLayout($imagenieData) {
+        if (gettype($imagenieData) !== 'object') {
+            return false;
         }
 
-		if (	$imagenieData->css && 
-				$imagenieData->css->avoidFaces && 
-				$imagenieData->css->avoidFaces !== false
-			) {
+        if (    $imagenieData->css && 
+                $imagenieData->css->avoidFaces && 
+                $imagenieData->css->avoidFaces !== false
+            ) {
 
-			// Quietst Quadrant
-			$this->layoutScheme = 'avoid-faces';
+            // Quietst Quadrant
+            $this->layoutScheme = 'avoid-faces';
             $this->imagePosition = $imagenieData->faces->direction;
 
 
             $attribute = 'max-width';
             $this->textFillPercent = 100;
 
-            if (intval($imagenieData->width) > 0) {
-            	$this->textFillPercent = max(intval((100 / intval($imagenieData->width)) * intval($imagenieData->css->avoidFaces->maxWidth)), 33);
-            	$attribute = 'max-width';
-            } elseif (intval($imagenieData->height) > 0) {
-            	$this->textFillPercent = max(intval((100 / intval($imagenieData->height)) * intval($imagenieData->css->avoidFaces->maxHeight)), 33);
-            	$attribute = 'max-height';
+            if (isset($imagenieData->css->avoidFaces->maxWidth) && intval($imagenieData->css->avoidFaces->maxWidth) > 0) {
+                $this->textFillPercent = max(intval((100 / intval($imagenieData->width)) * intval($imagenieData->css->avoidFaces->maxWidth)), 33);
+                $attribute = 'max-width';
+            } elseif (isset($imagenieData->css->avoidFaces->maxHeight) && intval($imagenieData->css->avoidFaces->maxHeight) > 0) {
+                $this->textFillPercent = max(intval((100 / intval($imagenieData->height)) * intval($imagenieData->css->avoidFaces->maxHeight)), 33);
+                $attribute = 'max-height';
             }
-			
+
             $this->generatedCss = '.avoid-faces .ig-overlay {'.PHP_EOL;
             $this->generatedCss .= $attribute.':'.$this->textFillPercent.'%;'.PHP_EOL;
             $this->generatedCss .= '}'.PHP_EOL;
 
         } else {
 
-        	// Quietst Quadrant
+            // Quietst Quadrant
             $this->layoutScheme = 'quietest-quadrant';
             $quietestQuadrantKey = $imagenieData->detail->quietestQuadrant;
             $this->imagePosition = 'qq-'.$imagenieData->detail->detailInQuadrant->$quietestQuadrantKey;
 
             // Clears down css
-			$this->generatedCss = '';
+            $this->generatedCss = '';
         }
-	}
+    }
 
-	private function generateContrast($imagenieData) {
+    private function generateContrast($imagenieData) {
 
         $this->imageContrast = 'unknown';
 
         // If the image light, contrasting or dark
         if ($imagenieData !== null && 
-        	$imagenieData->lightness && 
-        	$imagenieData->lightness->totalLightness && 
-        	$imagenieData->lightness->totalBytes
+            $imagenieData->lightness && 
+            $imagenieData->lightness->totalLightness && 
+            $imagenieData->lightness->totalBytes
         ) {
             // Lightness scale between 1 and $imagenieData->lightness->totalBytes (inclusive).
             // The nearer to 1, the lighter the image.
@@ -176,13 +176,14 @@ class Imagenie
     }
 
     public function toArray() {
-    	return array(
-    		"imagePosition" 	=> $this->imagePosition,
-    		"imageContrast" 	=> $this->imageContrast,
-    		"textFillPercent" 	=> $this->textFillPercent,
-    		"themePalette" 		=> $this->themePalette,
-    		"mood" 				=> $this->mood,
-    		"generatedCss" 		=> $this->generatedCss,
-    	);
+        return array(
+            "imagePosition"     => $this->imagePosition,
+            "imageContrast"     => $this->imageContrast,
+            "layoutScheme"      => $this->layoutScheme,
+            "textFillPercent"   => $this->textFillPercent,
+            "themePalette"      => $this->themePalette,
+            "mood"              => $this->mood,
+            "generatedCss"      => $this->generatedCss,
+        );
     }
 }
