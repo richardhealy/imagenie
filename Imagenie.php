@@ -3,10 +3,10 @@ class Imagenie
 {
     private $imagePosition = '';
     private $layoutScheme = '';
-    private $imageContrast = 'unknown';
+    private $imageContrast = 'ig-unknown';
     private $textFillPercent = 100;
     private $themePalette = array();
-    private $mood = 'unknown';
+    private $mood = 'ig-unknown';
     private $generatedCss = '';
 
     public function run($pythonLocation, $imagenieLocation, $filePath) {
@@ -47,7 +47,7 @@ class Imagenie
             ) {
 
             // Quietst Quadrant
-            $this->layoutScheme = 'avoid-faces';
+            $this->layoutScheme = 'ig-avoid-faces';
             $this->imagePosition = $imagenieData->faces->direction;
 
 
@@ -62,16 +62,16 @@ class Imagenie
                 $attribute = 'max-height';
             }
 
-            $this->generatedCss = '.avoid-faces .ig-overlay {'.PHP_EOL;
+            $this->generatedCss = '.ig-avoid-faces .ig-overlay {'.PHP_EOL;
             $this->generatedCss .= $attribute.':'.$this->textFillPercent.'%;'.PHP_EOL;
             $this->generatedCss .= '}'.PHP_EOL;
 
         } else {
 
             // Quietst Quadrant
-            $this->layoutScheme = 'quietest-quadrant';
+            $this->layoutScheme = 'ig-quietest-quadrant';
             $quietestQuadrantKey = $imagenieData->detail->quietestQuadrant;
-            $this->imagePosition = 'qq-'.$imagenieData->detail->detailInQuadrant->$quietestQuadrantKey;
+            $this->imagePosition = 'ig-qq-'.$imagenieData->detail->detailInQuadrant->$quietestQuadrantKey;
 
             // Clears down css
             $this->generatedCss = '';
@@ -80,7 +80,7 @@ class Imagenie
 
     private function generateContrast($imagenieData) {
 
-        $this->imageContrast = 'unknown';
+        $this->imageContrast = 'ig-unknown';
 
         // If the image light, contrasting or dark
         if ($imagenieData !== null && 
@@ -94,13 +94,13 @@ class Imagenie
 
             // 1 >= 1.5 = light image
             if ($scale > 1 && $scale <= 1.5) {
-                $this->imageContrast = 'light';
+                $this->imageContrast = 'ig-light';
             // 1.5 >= 2.5 = contrasting image
             } elseif ($scale > 1.5 && $scale <= 2.5) {
-                $this->imageContrast = 'contrasting';
+                $this->imageContrast = 'ig-contrasting';
             // 2.5 > totalBtyes = dark image
             } elseif ($scale > 2.5 && $scale <= 1.5) {
-                $this->imageContrast = 'dark';
+                $this->imageContrast = 'ig-dark';
             }
         }
     }
@@ -108,7 +108,7 @@ class Imagenie
     private function generateMood($imagenieData) {
         
         $temperature = 0;
-        $this->mood = 'unknown';
+        $this->mood = 'ig-unknown';
 
         if(!empty($imagenieData)) {
             foreach ($imagenieData->palette[0] as $rgb) {
@@ -125,20 +125,20 @@ class Imagenie
             // warm 
             if ($temperature > 0) {
                 if ($imagenieData->faces !== false && $imagenieData->smiles === true) {
-                    $this->mood = 'happy-warm';
+                    $this->mood = 'ig-happy-warm';
                 } elseif ($imagenieData->faces !== false && $imagenieData->smiles === false) {
-                    $this->mood = 'serious-warm';
+                    $this->mood = 'ig-serious-warm';
                 } elseif ($imagenieData->faces === false) {
-                    $this->mood = 'warm';
+                    $this->mood = 'ig-warm';
                 }
             // cold
             } elseif ($temperature <= 0) {
                 if ($imagenieData->faces !== false && $imagenieData->smiles === true) {
-                    $this->mood = 'happy-cold';
+                    $this->mood = 'ig-happy-cold';
                 } elseif ($imagenieData->faces !== false && $imagenieData->smiles === false) {
-                    $this->mood = 'serious-cold';
+                    $this->mood = 'ig-serious-cold';
                 } elseif ($imagenieData->faces === false) {
-                    $this->mood = 'cold';
+                    $this->mood = 'ig-cold';
                 }
             }
         }
