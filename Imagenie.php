@@ -48,7 +48,7 @@ class Imagenie
 
             // Quietst Quadrant
             $this->layoutScheme = 'ig-avoid-faces';
-            $this->imagePosition = $imagenieData->faces->direction;
+            $this->imagePosition = 'ig-' . $imagenieData->faces->direction;
 
 
             $attribute = 'max-width';
