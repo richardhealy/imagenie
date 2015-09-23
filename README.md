@@ -19,5 +19,10 @@ This will analyise the image included in the directory.
 Only tested with images of a jpg format.
 
 #Install Tesseract
-git clone git@github.com:madmaze/pytesseract.git
-sudo python tesseract/setup.py install 
+#Ubuntu
+#sudo apt-get install tesseract-ocr
+#For OSX
+brew install tesseract
+git clone https://github.com/madmaze/pytesseract.git
+cd pytesseract
+sudo python setup.py install 
