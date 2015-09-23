@@ -5,6 +5,11 @@ import numpy as np
 import colorific
 import sys
 import json
+try:
+    import Image
+except ImportError:
+    from PIL import Image
+import pytesseract
 
 def split_array(seq, num):
     avg = len(seq) / float(num)
@@ -172,6 +177,19 @@ def step6(gray, img):
     elif len(smiles) == 0:
         return False
 
+def step7(fileName):
+    result = detectText(fileName)
+    if len(result) > 0:
+        return result
+    else:
+        return False
+
+def detectText(fileName):
+
+    ocrResult = pytesseract.image_to_string(Image.open(fileName), lang=None, boxes=None, config='-psm=7')
+
+    return ocrResult
+
 def suggestFaceTextCSS(step1Results):
 
     if step1Results['direction'] == 'west':
@@ -267,6 +285,9 @@ step5Results = step5(fileName)
 # Step 6 - Get mood
 step6Result = step6(gray, img)
 
+# Step 7 - Detect text!
+step7Result = step7(fileName)
+
 avoidFacesCSS = False
 # If there are faces
 if step1Results != False:
@@ -277,9 +298,9 @@ quietestQuadrantCSS = suggestQuadrantCSS(step4Results['detailInQuadrant'][step4R
 css = {'avoidFaces':avoidFacesCSS, 'quietestQuadrant':quietestQuadrantCSS}
 
 # Don't include step 3 as it just flips the binarys based on lightness results
-finalResults = json.dumps({"width":imageWidth, "height":imageHeight, "css":css,"faces":step1Results,"smiles":step6Result,"lightness":step2Results,"detail":step4Results,"palette":step5Results}) 
+finalResults = json.dumps({"width":imageWidth, "height":imageHeight, "css":css,"faces":step1Results,"smiles":step6Result,"lightness":step2Results,"detail":step4Results,"palette":step5Results,"text":step7Result}) 
 
 print finalResults
 
 # DEBUG - If image has changed, write to it to show results
-#cv2.imwrite( "images/result.jpg", img)
+# cv2.imwrite( "result.jpg", img)

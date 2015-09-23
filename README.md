@@ -17,3 +17,7 @@ This will analyise the image included in the directory.
 ##Restrictions
 
 Only tested with images of a jpg format.
+
+#Install Tesseract
+git clone git@github.com:madmaze/pytesseract.git
+sudo python tesseract/setup.py install 
